@@ -8,9 +8,9 @@ namespace NFA2DFA
 {
     public class Edge
     {
-        public Node Node { get; set; }
+        public NodeOld Node { get; set; }
         public List<string> Value { get; set; }
-        public Edge(List<string> value, Node node)
+        public Edge(List<string> value, NodeOld node)
         {
             Value = value;
             Node = node;

@@ -6,34 +6,30 @@ using System.Threading.Tasks;
 
 namespace NFA2DFA
 {
-    
-
-   
-
-    public class NFA
+    public class NFAOld
     {
-        public Node StartNode { get; set; }
+        public NodeOld StartNode { get; set; }
         public List<string> Chars { get; set; } = new List<string>();
         public List<string> MoveSets { get; set; } = new List<string>();
-        public NFA(Node startnode)
+        public NFAOld(NodeOld startnode)
         {
             StartNode = startnode;
 
         }
 
-        public string NodeList2StringList(List<Node> n)
+        public string NodeList2StringList(List<NodeOld> n)
         {
             return String.Join(", ", n.Select(e => e.Name));
 
         }
 
-        public List<List<Node>> e_closure(List<Node> nodes, string c)
+        public List<List<NodeOld>> e_closure(List<NodeOld> nodes, string c)
         {
             if (nodes == null)
             {
-                return new List<List<Node>>();
+                return new List<List<NodeOld>>();
             }
-            List<List<Node>> e_closures = new List<List<Node>>();
+            List<List<NodeOld>> e_closures = new List<List<NodeOld>>();
             foreach (var node in nodes)
             {
                 e_closures.Add(Goto(node, c, false, false));
@@ -44,7 +40,7 @@ namespace NFA2DFA
             tmp.Add(e_closures.SelectMany(i => i).Distinct().ToList());
             e_closures = tmp.ToList();
             nodes = e_closures[0];
-            var e_closures_eps = new List<List<Node>>();
+            var e_closures_eps = new List<List<NodeOld>>();
             foreach (var node in nodes)
             {
                 e_closures_eps.Add(Goto(node, c, true, true));
@@ -63,9 +59,9 @@ namespace NFA2DFA
 
         }
 
-        private class nodes_comparer : IEqualityComparer<List<Node>>
+        private class nodes_comparer : IEqualityComparer<List<NodeOld>>
         {
-            public bool Equals(List<Node> x, List<Node> y)
+            public bool Equals(List<NodeOld> x, List<NodeOld> y)
             {
                 if (x.Count != y.Count)
                 {
@@ -81,13 +77,13 @@ namespace NFA2DFA
                 return true;
             }
 
-            public int GetHashCode(List<Node> obj)
+            public int GetHashCode(List<NodeOld> obj)
             {
                 throw new NotImplementedException();
             }
         }
 
-        public Node ToDFA(Node NFA)
+        public NodeOld ToDFA(NodeOld NFA)
         {
             // Since nodes in this list (Dfa) is used by reference, 
             // It is easier to just add the nodes to the list one at the time
@@ -96,11 +92,11 @@ namespace NFA2DFA
             // s3 we just change Dfa[3]. Instead if changing Dfa[0].EdgeL.Node.EdgeR.Node
             // You get the point :)
             // Pretty brilliant, huh :D
-            List<Node> Dfa = new List<Node>();
-            Dfa.Add(new Node("s0", Node.State.Initial, null, null));
+            List<NodeOld> Dfa = new List<NodeOld>();
+            Dfa.Add(new NodeOld("s0", NodeOld.State.Initial, null, null));
             int index = 0;
             bool data_processed = false;
-            var temp_nodes = new List<List<Node>>();
+            var temp_nodes = new List<List<NodeOld>>();
             temp_nodes.Add(Goto(this.StartNode, ""));
             while (!data_processed)
             {
@@ -122,7 +118,7 @@ namespace NFA2DFA
                             {
                                 Dfa[index].RightEdge = edge;
                             }
-                            Node new_node = new Node("s" + temp_nodes.Count, Node.State.Normal, null, null);
+                            NodeOld new_node = new NodeOld("s" + temp_nodes.Count, NodeOld.State.Normal, null, null);
                             Dfa.Add(new_node);
                             edge.Node = new_node;
                         }
@@ -142,9 +138,9 @@ namespace NFA2DFA
         {
             int index = 0;
             bool data_added = true;
-            Node current_node = StartNode;
-            List<KeyValuePair<string, List<Node>>> nodes = new List<KeyValuePair<string, List<Node>>>();
-            nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, Goto(current_node, "")));
+            NodeOld current_node = StartNode;
+            List<KeyValuePair<string, List<NodeOld>>> nodes = new List<KeyValuePair<string, List<NodeOld>>>();
+            nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, Goto(current_node, "")));
             MoveSets.Add(NodeList2StringList(Goto(current_node, "")));
             while (data_added)
             {
@@ -165,7 +161,7 @@ namespace NFA2DFA
                         int i = MoveSets.IndexOf(NodeList2StringList(l[l.Count - 1]));
                         if (i < 0)
                         {
-                            nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, l[l.Count - 1]));
+                            nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, l[l.Count - 1]));
 
                             MoveSets.Add(NodeList2StringList(l[l.Count - 1]));
                         }
@@ -176,7 +172,7 @@ namespace NFA2DFA
                     {
                         if (nodes.Count(x => x.Value != null) == nodes.Count)
                         {
-                            nodes.Add(new KeyValuePair<string, List<Node>>("NULL", null));
+                            nodes.Add(new KeyValuePair<string, List<NodeOld>>("NULL", null));
                             MoveSets.Add("Ø");
                             Console.WriteLine("              = Ø");
                             Console.WriteLine("              = {0}", "s" + (MoveSets.Count - 1).ToString());
@@ -224,9 +220,9 @@ namespace NFA2DFA
         {
             int index = 0;
             bool data_added = true;
-            Node current_node = StartNode;
-            List<KeyValuePair<string, List<Node>>> nodes = new List<KeyValuePair<string, List<Node>>>();
-            nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, Goto(current_node, "")));
+            NodeOld current_node = StartNode;
+            List<KeyValuePair<string, List<NodeOld>>> nodes = new List<KeyValuePair<string, List<NodeOld>>>();
+            nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, Goto(current_node, "")));
             MoveSets.Add(NodeList2StringList(Goto(current_node, "")));
             while (data_added)
             {
@@ -240,7 +236,7 @@ namespace NFA2DFA
                     var l = e_closure(nodes[index].Value, e);
                     if (l.Count != 0)
                     {
-                        nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, l[l.Count - 1]));
+                        nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, l[l.Count - 1]));
 
                         int i = MoveSets.IndexOf(NodeList2StringList(l[l.Count - 1]));
                         if (i < 0)
@@ -264,11 +260,11 @@ namespace NFA2DFA
 
         }
 
-        private bool isAcceptingNode(List<Node> nodes)
+        private bool isAcceptingNode(List<NodeOld> nodes)
         {
             for (int i = 0; i < nodes.Count; i++)
             {
-                if (nodes[i].StateOfNode == Node.State.Accepting)
+                if (nodes[i].StateOfNode == NodeOld.State.Accepting)
                     return true;
             }
             return false;
@@ -283,8 +279,8 @@ namespace NFA2DFA
 
             bool above = true;
             bool data_added = true;
-            List<KeyValuePair<string, List<Node>>> nodes = new List<KeyValuePair<string, List<Node>>>();
-            nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, Goto(StartNode, "")));
+            List<KeyValuePair<string, List<NodeOld>>> nodes = new List<KeyValuePair<string, List<NodeOld>>>();
+            nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, Goto(StartNode, "")));
             MoveSets.Add(NodeList2StringList(Goto(StartNode, "")));
 
             string node_setup = "\\documentclass{article}\n"
@@ -318,7 +314,7 @@ namespace NFA2DFA
                         {
 
                             MoveSets.Add(NodeList2StringList(l[l.Count - 1]));
-                            nodes.Add(new KeyValuePair<string, List<Node>>("s" + nodes.Count, l[l.Count - 1]));
+                            nodes.Add(new KeyValuePair<string, List<NodeOld>>("s" + nodes.Count, l[l.Count - 1]));
 
                         }
 
@@ -339,7 +335,7 @@ namespace NFA2DFA
                     {
                         if (nodes.Count(x => x.Value != null) == nodes.Count)
                         {
-                            nodes.Add(new KeyValuePair<string, List<Node>>("NULL", null));
+                            nodes.Add(new KeyValuePair<string, List<NodeOld>>("NULL", null));
                             MoveSets.Add("Ø");
                         }
                     }
@@ -356,10 +352,10 @@ namespace NFA2DFA
             Console.WriteLine(node_setup);
             Console.WriteLine(node_path);
         }
-        public List<Node> Goto(Node nfa, string c, bool eps = true, bool include_first = true)
+        public List<NodeOld> Goto(NodeOld nfa, string c, bool eps = true, bool include_first = true)
         {
-            List<Node> nodes = new List<Node>();
-            List<Node> nodes_added = new List<Node>();
+            List<NodeOld> nodes = new List<NodeOld>();
+            List<NodeOld> nodes_added = new List<NodeOld>();
             nodes.Add(nfa);
             bool data_inserted = true;
             int index = 0;
@@ -401,7 +397,9 @@ namespace NFA2DFA
 
     class Program
     {
-        static string get_text_inside_brackets(string text)
+
+
+        static string GetTextInsideParentheses(string text)
         {
             int posFirst = text.IndexOf("(");
             int posLast = text.LastIndexOf(")");
@@ -415,93 +413,85 @@ namespace NFA2DFA
             }
         }
 
-        static List<Node> fill_nodes(string str)
+        static List<NodeOld> GetAllNodes(string str)
         {
-            int counter = 0;
             string line;
 
             // Read the file and display it line by line.  
-            List<Node> Nodes = new List<Node>();
+            List<NodeOld> nodes = new List<NodeOld>();
             System.IO.StreamReader file = new System.IO.StreamReader(str);
 
             while ((line = file.ReadLine()) != null)
             {
-                var lines = line.Split(new string[] { "->" }, StringSplitOptions.None);
+                var splittedText = line.Split(new string[] { "->" }, StringSplitOptions.None);
 
                 // Node state is initial
-                if (lines[0].StartsWith("_"))
+                string firstNode = splittedText[0];
+                if (firstNode.StartsWith("_"))
                 {
-                    if (!Nodes.Exists(x => x.Name == lines[counter].Substring(1)))
-                    {
-                        Node n = new Node(lines[0].Substring(1), Node.State.Initial, null, null);
-                        Nodes.Add(n);
-                    }
+                    AddInitialNodeToList(nodes, firstNode);
                 }
-
                 // Node state is accepting
-                else if (get_text_inside_brackets(lines[0]) != lines[0])
+                else if (GetTextInsideParentheses(splittedText[0]) != splittedText[0])
                 {
-                    Node n = new Node(get_text_inside_brackets(lines[0]), Node.State.Accepting, null, null);
-
-                    if (get_text_inside_brackets(lines[0]).StartsWith("_")) // If node is Accepting AND Initial state 
-                    {
-                        n.StateOfNode = Node.State.Accepting | Node.State.Initial;
-                    }
-
-                    Nodes.Add(n);
+                    AddAcceptingNodeToList(nodes, firstNode);
                 }
                 else // Node state is normal
                 {
-                    if (!Nodes.Exists(x => x.Name == lines[counter]))
-                    {
-                        Node n = new Node(lines[0], Node.State.Normal, null, null);
-                        Nodes.Add(n);
-                    }
+                    AddNormalNodeToList(nodes, firstNode);
                 }
             }
-            return Nodes;
+            return nodes;
         }
 
+       
+        private static void AddInitialNodeToList(List<NodeOld> nodes, string nodeName)
+        {
+            if (!nodes.Exists(node => node.Name == nodeName.Substring(1)))
+            {
+                NodeOld n = new NodeOld(nodeName.Substring(1), NodeOld.State.Initial, null, null);
+                nodes.Add(n);
+            }
+        }
+
+        private static void AddNormalNodeToList(List<NodeOld> nodes, string nodeName)
+        {
+            if (!nodes.Exists(x => x.Name == nodeName))
+            {
+                NodeOld n = new NodeOld(nodeName, NodeOld.State.Normal, null, null);
+                nodes.Add(n);
+            }
+        }
+
+        private static void AddAcceptingNodeToList(List<NodeOld> nodes, string nodeName)
+        {
+            NodeOld n = new NodeOld(GetTextInsideParentheses(nodeName), NodeOld.State.Accepting, null, null);
+
+            if (GetTextInsideParentheses(nodeName).StartsWith("_")) // If node is Accepting AND Initial state 
+            {
+                n.StateOfNode = NodeOld.State.Accepting | NodeOld.State.Initial;
+            }
+
+            nodes.Add(n);
+        }
 
         static void Main(string[] args)
         {
-
-            int counter = 0;
-            string line;
-
+            
             // Read the file and display it line by line.  
 
             string path = "binary2.nfa";
             //System.IO.StreamReader file = new System.IO.StreamReader(args[0]);
             //List<Node> Nodes = fill_nodes(args[0]);
-            List<Node> Nodes = fill_nodes(path);
-            System.IO.StreamReader file = new System.IO.StreamReader(path);
+            List<NodeOld> Nodes = GetAllNodes(path);
 
-            while ((line = file.ReadLine()) != null)
-            {
-                var lines = line.Split(new string[] { "->" }, StringSplitOptions.None);
-                if (lines.Count() == 1) { continue; }
-                Edge e = new Edge(lines[1].Split('|').ToList(), Nodes.Find(x => x.Name == (get_text_inside_brackets(lines[2]).StartsWith("_") ? get_text_inside_brackets(lines[2]).Substring(1) : get_text_inside_brackets(lines[2]))));
 
-                string node_name = (lines[0].StartsWith("_") ? lines[0].Substring(1) : get_text_inside_brackets(lines[0]));
-                if (Nodes.Find(x => x.Name == node_name).LeftEdge == null)
-                {
-                    Nodes.Find(x => x.Name == node_name).LeftEdge = e;
-                }
-                else
-                {
-                    Nodes.Find(x => x.Name == node_name).RightEdge = e;
-                }
+            NFAFileReader fileReader = new NFAFileReader(path);
+            fileReader.ConnectNodes(Nodes);
 
-                counter++;
-            }
 
-            file.Close();
-            System.Console.WriteLine("There were {0} lines.", counter);
-            // Suspend the screen.  
-            System.Console.ReadLine();
 
-            var nfa = new NFA(Nodes[0]);
+            var nfa = new NFAOld(Nodes[0]);
             nfa.Chars.Add("0");
             nfa.Chars.Add("1");
             nfa.MoveSet();
