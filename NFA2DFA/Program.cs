@@ -17,31 +17,7 @@ namespace NFA2DFA
         }
     }
 
-    public class Node
-    {
-        [Flags]
-        public enum State
-        {
-            Accepting = 1,
-            Initial = 2,
-            Normal = 4
-        }
-
-        public State Stateval { get; set; }
-
-        public string Name { get; set; }
-
-        public Node(string name, State state, Edge e1, Edge e2)
-        {
-            Name = name;
-            Stateval = state;
-
-            EdgeL = e1;
-            EdgeR = e2;
-        }
-        public Edge EdgeL { get; set; }
-        public Edge EdgeR { get; set; }
-    }
+   
 
     public class NFA
     {
@@ -147,13 +123,13 @@ namespace NFA2DFA
                         if (!temp_nodes.Contains(eps_closure.Last(), new nodes_comparer()))
                         {
                             temp_nodes.Add(eps_closure.Last().ToList());
-                            if (Dfa[index].EdgeL == null) // If left child is  null
+                            if (Dfa[index].LeftEdge == null) // If left child is  null
                             {
-                                Dfa[index].EdgeL = edge;
+                                Dfa[index].LeftEdge = edge;
                             }
                             else
                             {
-                                Dfa[index].EdgeR = edge;
+                                Dfa[index].RightEdge = edge;
                             }
                             Node new_node = new Node("s" + temp_nodes.Count, Node.State.Normal, null, null);
                             Dfa.Add(new_node);
@@ -301,7 +277,7 @@ namespace NFA2DFA
         {
             for (int i = 0; i < nodes.Count; i++)
             {
-                if (nodes[i].Stateval == Node.State.Accepting)
+                if (nodes[i].StateOfNode == Node.State.Accepting)
                     return true;
             }
             return false;
@@ -398,21 +374,21 @@ namespace NFA2DFA
             int index = 0;
             while (data_inserted)
             {
-                if (nodes[index] != null && nodes[index].EdgeL != null && (nodes[index].EdgeL.Value.Exists(a => a == c) || (eps && nodes[index].EdgeL.Value.Exists(a => a == "eps"))))
+                if (nodes[index] != null && nodes[index].LeftEdge != null && (nodes[index].LeftEdge.Value.Exists(a => a == c) || (eps && nodes[index].LeftEdge.Value.Exists(a => a == "eps"))))
                 {
-                    if (!nodes.Contains(nodes[index].EdgeL.Node))
+                    if (!nodes.Contains(nodes[index].LeftEdge.Node))
                     {
-                        nodes.Add(nodes[index].EdgeL.Node);
+                        nodes.Add(nodes[index].LeftEdge.Node);
                     }
-                    nodes_added.Add(nodes[index].EdgeL.Node);
+                    nodes_added.Add(nodes[index].LeftEdge.Node);
                 }
-                if (nodes[index] != null && nodes[index].EdgeR != null && (nodes[index].EdgeR.Value.Exists(a => a == c) || (eps && nodes[index].EdgeR.Value.Exists(a => a == "eps"))))
+                if (nodes[index] != null && nodes[index].RightEdge != null && (nodes[index].RightEdge.Value.Exists(a => a == c) || (eps && nodes[index].RightEdge.Value.Exists(a => a == "eps"))))
                 {
-                    if (!nodes.Contains(nodes[index].EdgeR.Node))
+                    if (!nodes.Contains(nodes[index].RightEdge.Node))
                     {
-                        nodes.Add(nodes[index].EdgeR.Node);
+                        nodes.Add(nodes[index].RightEdge.Node);
                     }
-                    nodes_added.Add(nodes[index].EdgeR.Node);
+                    nodes_added.Add(nodes[index].RightEdge.Node);
                 }
                 index++;
                 if (nodes.Count <= index)
@@ -478,7 +454,7 @@ namespace NFA2DFA
 
                     if (get_text_inside_brackets(lines[0]).StartsWith("_")) // If node is Accepting AND Initial state 
                     {
-                        n.Stateval = Node.State.Accepting | Node.State.Initial;
+                        n.StateOfNode = Node.State.Accepting | Node.State.Initial;
                     }
 
                     Nodes.Add(n);
@@ -517,13 +493,13 @@ namespace NFA2DFA
                 Edge e = new Edge(lines[1].Split('|').ToList(), Nodes.Find(x => x.Name == (get_text_inside_brackets(lines[2]).StartsWith("_") ? get_text_inside_brackets(lines[2]).Substring(1) : get_text_inside_brackets(lines[2]))));
 
                 string node_name = (lines[0].StartsWith("_") ? lines[0].Substring(1) : get_text_inside_brackets(lines[0]));
-                if (Nodes.Find(x => x.Name == node_name).EdgeL == null)
+                if (Nodes.Find(x => x.Name == node_name).LeftEdge == null)
                 {
-                    Nodes.Find(x => x.Name == node_name).EdgeL = e;
+                    Nodes.Find(x => x.Name == node_name).LeftEdge = e;
                 }
                 else
                 {
-                    Nodes.Find(x => x.Name == node_name).EdgeR = e;
+                    Nodes.Find(x => x.Name == node_name).RightEdge = e;
                 }
 
                 counter++;
