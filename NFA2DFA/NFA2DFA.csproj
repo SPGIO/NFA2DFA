@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DFAOutputFormatter\IDFAOutputFormatter.cs" />
+    <Compile Include="DFAOutputFormatter\TextFormatter.cs" />
+    <Compile Include="DFAOutputFormatter\TikzFormatter.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="NFA.cs" />
     <Compile Include="NFAFileReader.cs" />

@@ -478,20 +478,15 @@ namespace NFA2DFA
         static void Main(string[] args)
         {
             
-            // Read the file and display it line by line.  
-
             string path = "binary2.nfa";
-            //System.IO.StreamReader file = new System.IO.StreamReader(args[0]);
-            //List<Node> Nodes = fill_nodes(args[0]);
-            List<NodeOld> Nodes = GetAllNodes(path);
-
+            //List<NodeOld> Nodes = GetAllNodes(path);
 
             NFAFileReader fileReader = new NFAFileReader(path);
-            fileReader.ConnectNodes(Nodes);
+            fileReader.ConnectNodes();
 
 
 
-            var nfa = new NFAOld(Nodes[0]);
+            var nfa = new NFAOld(fileReader.FirstNode);
             nfa.Chars.Add("0");
             nfa.Chars.Add("1");
             nfa.MoveSet();

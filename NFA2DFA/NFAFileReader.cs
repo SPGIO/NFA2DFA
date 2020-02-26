@@ -67,50 +67,54 @@ namespace NFA2DFA
             }
         }
 
+        private List<NodeOld> AllNodes;
+
         public NFAFileReader(string path)
         {
             FileContent = ReadFile(path);
         }
 
+        public NodeOld FirstNode { get => AllNodes.First(); }
 
 
 
-
-        private static Edge CreateEdge(List<NodeOld> nodes, NodeOld destinationNode, string product)
+        private static Edge CreateEdge(NodeOld destinationNode, string product)
         {
             Edge edge = new Edge(product.Split('|').ToList(), destinationNode);
             return edge;
         }
-        private void UpdateEdgeOnSourceNode(List<NodeOld> nodes, NodeOld sourceNode, Edge edge)
+        private void UpdateEdgeOnSourceNode(NodeOld sourceNode, Edge edge)
         {
             if (sourceNode.LeftEdge == null)
                 sourceNode.LeftEdge = edge;
             else sourceNode.RightEdge = edge;
 
         }
-        private void CreateAndUpdateEdgeOnSourceNode(List<NodeOld> nodes, NodeOld sourceNode, NodeOld destinationNode, string product)
+        private void CreateAndUpdateEdgeOnSourceNode(NodeOld sourceNode, NodeOld destinationNode, string product)
         {
-            Edge edge = CreateEdge(nodes, destinationNode, product);
-            UpdateEdgeOnSourceNode(nodes, sourceNode, edge);
+            Edge edge = CreateEdge(destinationNode, product);
+            UpdateEdgeOnSourceNode(sourceNode, edge);
         }
 
-        private NodeOld GetNodeByName(List<NodeOld> nodes, string name)
+        private NodeOld GetNodeByName(string name)
         {
             string strippedName = name.StripTextOfParenthesesAndUnderscore();
-            NodeOld nodeFound = nodes.Find(x => x.Name == strippedName);
+            NodeOld nodeFound = AllNodes.Find(x => x.Name == strippedName);
             return nodeFound;
 
         }
-        public void ConnectNodes(List<NodeOld> nodes)
+
+        public void ConnectNodes()
         {
+            AllNodes = GetAllNodesInFile();
             foreach (string line in FileContent)
             {
                 var splittedText = line.Split(new string[] { "->" }, StringSplitOptions.None);
                 if (splittedText.Count() == 1) { continue; }
                 string product = splittedText[1];
-                NodeOld sourceNode = GetNodeByName(nodes, splittedText[0]);
-                NodeOld destinationNode = GetNodeByName(nodes, splittedText[2]);
-                CreateAndUpdateEdgeOnSourceNode(nodes, sourceNode, destinationNode, product);
+                NodeOld sourceNode = GetNodeByName(splittedText[0]);
+                NodeOld destinationNode = GetNodeByName(splittedText[2]);
+                CreateAndUpdateEdgeOnSourceNode(sourceNode, destinationNode, product);
             }
         }
 
@@ -161,7 +165,7 @@ namespace NFA2DFA
                     AddInitialNodeToList(nodes, firstNode);
                 }
                 // Node state is accepting
-                else if (splittedText[0].GetTextInsideParentheses() != splittedText[0])
+                else if (splittedText[0].HasParentheses())
                 {
                     AddAcceptingNodeToList(nodes, firstNode);
                 }
